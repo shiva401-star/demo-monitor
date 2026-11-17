@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h1 class="page-title">Login</h1>
+<p class="page-lead">Sign in to access the read-only monitoring UI.</p>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flash-list">
+      {% for category, message in messages %}
+        <li class="flash flash-{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{% set next_path = request.args.get('next') %}
+<form class="auth-form" method="post" action="{% if next_path %}{{ url_for('main.login', next=next_path) }}{% else %}{{ url_for('main.login') }}{% endif %}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label class="field">
+    <span>Username</span>
+    <input type="text" name="username" autocomplete="username" required autofocus>
+  </label>
+  <label class="field">
+    <span>Password</span>
+    <input type="password" name="password" autocomplete="current-password" required>
+  </label>
+  <button class="btn btn-primary" type="submit">Sign in</button>
+</form>
+{% endblock %}

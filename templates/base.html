@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Demo Monitoring{% endblock %} · Ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('main.home') }}">
+      <span class="brand-mark">◈</span>
+      <span>Demo Monitoring</span>
+      <span class="brand-sub">Linux · read-only</span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      {% if is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}" {% if request.endpoint == 'main.dashboard' %}aria-current="page"{% endif %}>Dashboard</a>
+        <a href="{{ url_for('main.add_server') }}" {% if request.endpoint == 'main.add_server' %}aria-current="page"{% endif %}>Add server</a>
+        <form class="nav-logout" method="post" action="{{ url_for('main.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="nav-button">Logout</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('main.login') }}" {% if request.endpoint == 'main.login' %}aria-current="page"{% endif %}>Login</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages and request.endpoint != 'main.login' %}
+        <ul class="flash-list">
+          {% for category, message in messages %}
+            <li class="flash flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

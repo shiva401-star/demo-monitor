@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero-home">
+  <h1 class="page-title">Demo Monitoring Infrastructure</h1>
+  <p class="page-lead">
+    Local dark-ops UI for live Linux server metrics — read-only after sign-in.
+    No remote shell, no target config changes.
+  </p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="{{ url_for('main.login') }}">Login</a>
+    <a class="btn" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+  </div>
+</section>
+{% endblock %}

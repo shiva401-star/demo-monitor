@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+<p class="page-lead">Server list and status will appear here. Read-only monitoring view (stub).</p>
+<p class="stub-note">Stub · no servers loaded · example detail:
+  <a href="{{ url_for('main.server_detail', server_id=1) }}">Server #1</a>
+</p>
+{% endblock %}
