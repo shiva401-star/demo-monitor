@@ -2,6 +2,69 @@
 {% block title %}Add server{% endblock %}
 {% block content %}
 <h1 class="page-title">Add server</h1>
-<p class="page-lead">Registration form comes in a later phase. No mutating forms in this stub.</p>
-<p class="stub-note">Stub · links only · no remote commands · no POST yet</p>
+<p class="page-lead">Register a Linux host for read-only SSH monitoring. Credentials stay on this machine only.</p>
+
+<form class="auth-form server-form" method="post" action="{{ url_for('main.add_server') }}" autocomplete="off">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <label class="field">
+    <span>Display name</span>
+    <input type="text" name="display_name" maxlength="120" required>
+  </label>
+
+  <label class="field">
+    <span>Hostname / IP</span>
+    <input type="text" name="host" maxlength="253" required placeholder="192.168.1.10">
+  </label>
+
+  <label class="field">
+    <span>SSH port</span>
+    <input type="number" name="ssh_port" min="1" max="65535" value="22" required>
+  </label>
+
+  <label class="field">
+    <span>SSH username</span>
+    <input type="text" name="ssh_username" maxlength="64" required autocomplete="off">
+  </label>
+
+  <fieldset class="auth-type">
+    <legend>Auth</legend>
+    <label class="radio">
+      <input type="radio" name="auth_type" value="password" checked>
+      Password
+    </label>
+    <label class="radio">
+      <input type="radio" name="auth_type" value="key">
+      Private key (PEM)
+    </label>
+  </fieldset>
+
+  <label class="field" id="password-field">
+    <span>SSH password</span>
+    <input type="password" name="ssh_password" autocomplete="new-password">
+  </label>
+
+  <label class="field" id="key-field" hidden>
+    <span>Private key content</span>
+    <textarea name="ssh_private_key" rows="6" spellcheck="false" placeholder="-----BEGIN … PRIVATE KEY-----"></textarea>
+  </label>
+
+  <button class="btn btn-primary" type="submit">Add &amp; check SSH</button>
+</form>
+
+<script>
+  (function () {
+    var radios = document.querySelectorAll('input[name="auth_type"]');
+    var pw = document.getElementById('password-field');
+    var key = document.getElementById('key-field');
+    function sync() {
+      var selected = document.querySelector('input[name="auth_type"]:checked');
+      var isKey = selected && selected.value === 'key';
+      pw.hidden = isKey;
+      key.hidden = !isKey;
+    }
+    radios.forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+  })();
+</script>
 {% endblock %}

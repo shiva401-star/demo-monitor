@@ -38,11 +38,29 @@ def init_db() -> None:
         )
         """
     )
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS servers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            display_name TEXT NOT NULL,
+            host TEXT NOT NULL,
+            ssh_port INTEGER NOT NULL DEFAULT 22,
+            ssh_username TEXT NOT NULL,
+            auth_type TEXT NOT NULL CHECK (auth_type IN ('password', 'key')),
+            secret_encrypted TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+        """
+    )
     db.commit()
 
 
 def query_one(sql: str, args: tuple[Any, ...] = ()) -> sqlite3.Row | None:
     return get_db().execute(sql, args).fetchone()
+
+
+def query_all(sql: str, args: tuple[Any, ...] = ()) -> list[sqlite3.Row]:
+    return get_db().execute(sql, args).fetchall()
 
 
 def execute(sql: str, args: tuple[Any, ...] = ()) -> None:

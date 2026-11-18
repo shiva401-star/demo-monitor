@@ -1,4 +1,4 @@
-"""Test fixtures — dummy secrets and isolated DB only."""
+"""Test fixtures — dummy secrets, isolated DB, no live SSH."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ def app(tmp_path):
             "SECRET_KEY": "test-secret-key",
             "DATABASE": str(db_path),
             "DEMO_PASSWORD": "test-pass-ok",
+            "SKIP_SSH": True,
         }
     )
     yield application
@@ -46,3 +47,30 @@ def login(client, password: str = "test-pass-ok", username: str = "admin"):
         data={"username": username, "password": password, "csrf_token": token},
         follow_redirects=False,
     )
+
+
+def add_server(
+    client,
+    *,
+    display_name: str = "lab-1",
+    host: str = "10.0.0.5",
+    ssh_port: str = "22",
+    ssh_username: str = "monitor",
+    auth_type: str = "password",
+    ssh_password: str = "fake-secret",
+    ssh_private_key: str = "",
+):
+    client.get("/servers/add")
+    with client.session_transaction() as sess:
+        token = sess["_csrf_token"]
+    data = {
+        "csrf_token": token,
+        "display_name": display_name,
+        "host": host,
+        "ssh_port": ssh_port,
+        "ssh_username": ssh_username,
+        "auth_type": auth_type,
+        "ssh_password": ssh_password,
+        "ssh_private_key": ssh_private_key,
+    }
+    return client.post("/servers/add", data=data, follow_redirects=False)

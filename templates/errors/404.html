@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Not found{% endblock %}
+{% block content %}
+<h1 class="page-title">Not found</h1>
+<p class="page-lead">That page or server does not exist.</p>
+<p><a class="btn" href="{{ url_for('main.home') }}">Home</a></p>
+{% endblock %}
