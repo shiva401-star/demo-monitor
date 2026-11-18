@@ -1,7 +1,65 @@
 {% extends "base.html" %}
-{% block title %}Server {{ server_id }}{% endblock %}
+{% block title %}{{ server.display_name }}{% endblock %}
+{% block head %}
+<meta http-equiv="refresh" content="{{ refresh_seconds }}">
+{% endblock %}
 {% block content %}
-<h1 class="page-title">Server detail</h1>
-<p class="page-lead">CPU, memory, network, and ports for one host will render here.</p>
-<p class="stub-note">Stub · server id {{ server_id }} · metrics not collected yet</p>
+<p class="crumb"><a href="{{ url_for('main.dashboard') }}">Dashboard</a> / Server detail</p>
+<h1 class="page-title">{{ server.display_name }}</h1>
+<p class="page-lead">
+  <span class="mono">{{ server.host }}:{{ server.ssh_port }}</span>
+  · user <span class="mono">{{ server.ssh_username }}</span>
+  · <span class="badge badge-{{ status }}">{{ status }}</span>
+  · refresh ~{{ refresh_seconds }}s
+</p>
+
+{% if metrics is none %}
+  <p class="empty-state">Unreachable or auth failed — metrics unavailable. No credentials are displayed.</p>
+{% else %}
+  <section class="metric-grid" aria-label="MVP metrics">
+    <article class="metric-card">
+      <h2>CPU</h2>
+      <p class="metric-value">
+        {% if metrics.cpu.percent is not none %}{{ metrics.cpu.percent }}%{% else %}n/a{% endif %}
+      </p>
+    </article>
+    <article class="metric-card">
+      <h2>Memory</h2>
+      <p class="metric-value">{{ metrics.memory.percent }}%</p>
+      <p class="metric-sub mono">
+        {{ format_bytes(metrics.memory.used_bytes) }} / {{ format_bytes(metrics.memory.total_bytes) }}
+      </p>
+    </article>
+    <article class="metric-card">
+      <h2>Network</h2>
+      <p class="metric-sub mono">rx {{ format_bytes(metrics.network.rx_bytes) }}</p>
+      <p class="metric-sub mono">tx {{ format_bytes(metrics.network.tx_bytes) }}</p>
+    </article>
+  </section>
+
+  <section class="ports-section">
+    <h2 class="section-title">Listening ports</h2>
+    <p class="page-lead">Informational only (from <span class="mono">ss -lntu</span>).</p>
+    {% if not metrics.ports %}
+      <p class="empty-state">No ports parsed.</p>
+    {% else %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Proto</th><th>Local</th><th>State</th></tr>
+          </thead>
+          <tbody>
+            {% for p in metrics.ports %}
+              <tr>
+                <td class="mono">{{ p.proto }}</td>
+                <td class="mono">{{ p.local }}</td>
+                <td class="mono">{{ p.state }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </section>
+{% endif %}
 {% endblock %}

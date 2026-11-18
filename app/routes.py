@@ -1,8 +1,16 @@
-"""App routes: home, auth, and protected monitoring stubs."""
+"""App routes: auth, inventory, dashboard, and read-only metrics."""
 
 from __future__ import annotations
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from app.auth import (
     login_required,
@@ -12,6 +20,15 @@ from app.auth import (
     verify_password,
 )
 from app.db import query_one
+from app.metrics import format_bytes
+from app.servers import (
+    check_new_server_reachable,
+    create_server,
+    dashboard_rows,
+    fetch_metrics_for,
+    get_server,
+)
+from app.validators import parse_server_form
 
 bp = Blueprint("main", __name__)
 
@@ -70,16 +87,55 @@ def logout():
 @bp.get("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    servers = dashboard_rows()
+    return render_template(
+        "dashboard.html",
+        servers=servers,
+        refresh_seconds=10,
+    )
+
+
+@bp.route("/servers/add", methods=["GET", "POST"])
+@login_required
+def add_server():
+    if request.method == "GET":
+        return render_template("add_server.html")
+
+    if not validate_csrf_token(request.form.get("csrf_token")):
+        flash("Invalid session token. Try again.", "error")
+        return render_template("add_server.html"), 400
+
+    try:
+        data = parse_server_form(request.form)
+    except ValueError as exc:
+        flash(str(exc), "error")
+        return render_template("add_server.html"), 400
+
+    if not check_new_server_reachable(data):
+        flash(
+            "Unreachable or auth failed — check host, port, and credentials.",
+            "error",
+        )
+        return render_template("add_server.html"), 400
+
+    server_id = create_server(data)
+    flash("Server added.", "ok")
+    return redirect(url_for("main.server_detail", server_id=server_id))
 
 
 @bp.get("/servers/<int:server_id>")
 @login_required
 def server_detail(server_id: int):
-    return render_template("server_detail.html", server_id=server_id)
-
-
-@bp.get("/servers/add")
-@login_required
-def add_server():
-    return render_template("add_server.html")
+    server = get_server(server_id)
+    if server is None:
+        abort(404)
+    metrics = fetch_metrics_for(server_id)
+    status = "reachable" if metrics is not None else "unreachable"
+    return render_template(
+        "server_detail.html",
+        server=server,
+        metrics=metrics,
+        status=status,
+        format_bytes=format_bytes,
+        refresh_seconds=10,
+    )

@@ -253,3 +253,154 @@ button.btn {
 .nav-button:hover {
   color: var(--accent);
 }
+
+.server-form {
+  max-width: 28rem;
+}
+
+.server-form textarea {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.auth-type {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+.auth-type legend {
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0 0.35rem;
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: 1rem;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge-reachable {
+  background: rgba(61, 214, 198, 0.15);
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+}
+
+.badge-unreachable {
+  background: #1a1010;
+  color: #f0a8a8;
+  border: 1px solid #5c2a2a;
+}
+
+.empty-state {
+  padding: 1.25rem;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  background: var(--bg-elevated);
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.metric-card {
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+}
+
+.metric-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.metric-value {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.metric-sub {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.section-title {
+  margin: 2rem 0 0.35rem;
+  font-size: 1.1rem;
+}
+
+.crumb {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

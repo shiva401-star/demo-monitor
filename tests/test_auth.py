@@ -71,9 +71,10 @@ def test_protected_routes_redirect_when_anonymous(client):
 
 def test_protected_routes_ok_when_authenticated(client):
     login(client)
-    for path in ("/dashboard", "/servers/1", "/servers/add"):
-        response = client.get(path)
-        assert response.status_code == 200
+    assert client.get("/dashboard").status_code == 200
+    assert client.get("/servers/add").status_code == 200
+    # No server id 1 yet → 404 page (still authenticated)
+    assert client.get("/servers/1").status_code == 404
 
 
 def test_session_cookie_httponly_configured(app):

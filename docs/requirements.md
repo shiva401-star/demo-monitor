@@ -102,12 +102,12 @@ No disk, uptime, or process list in MVP.
 
 ## 9. Acceptance criteria
 
-- [ ] Login works with `admin` and hashed password; wrong password rejected
-- [ ] UI is dark-ops styled and read-only for monitoring
-- [ ] User can add a Linux server with hostname/IP, SSH port, username, and key or password
-- [ ] Dashboard lists servers; Server detail shows CPU, memory, network, ports
-- [ ] Metrics refresh about every 10 seconds while viewing
-- [ ] App runs locally with a short install/run path; no Docker/HTTPS/alerts/history/roles required
+- [x] Login works with `admin` and hashed password; wrong password rejected
+- [x] UI is dark-ops styled and read-only for monitoring
+- [x] User can add a Linux server with hostname/IP, SSH port, username, and key or password
+- [x] Dashboard lists servers; Server detail shows CPU, memory, network, ports
+- [x] Metrics refresh about every 10 seconds while viewing
+- [x] App runs locally with a short install/run path; no Docker/HTTPS/alerts/history/roles required
 
 ## 10. Open points for implementation
 

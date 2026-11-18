@@ -2,6 +2,8 @@
 
 Local dark-ops web UI for viewing live Linux server metrics over SSH — **read-only** after sign-in.
 
+Docs: [PRD](docs/requirements.md) · [TODO](docs/TODO.md) · [Metrics](docs/metrics.md) · [CI](docs/ci.md)
+
 ## Setup
 
 ```bash
@@ -12,20 +14,16 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
-Install only from the pinned `requirements.txt` / `requirements-dev.txt`. Do not commit `venv/`.
+Install only from the pinned `requirements.txt` / `requirements-dev.txt`. Do not commit `venv/`, `.env`, `instance/`, `*.db`, or private keys.
 
 Optional: copy `.env.example` to `.env` and set `SECRET_KEY` (never commit `.env`).
 
-## Run
-
-Bind to loopback on port **5140** (5100 is often already taken on shared hosts):
+## Run (local demo)
 
 ```bash
 source venv/bin/activate
-export SECRET_KEY=dev-only-change-me   # placeholder for local demo
+export SECRET_KEY=dev-only-change-me
 export FLASK_APP=app
-export FLASK_RUN_HOST=127.0.0.1
-export FLASK_RUN_PORT=5140
 flask run --host 127.0.0.1 --port 5140
 # or: python -m app
 ```
@@ -41,35 +39,56 @@ Open [http://127.0.0.1:5140](http://127.0.0.1:5140).
 
 Override the seed password with `DEMO_PASSWORD` before first run if desired.
 
-### Login / logout (local demo)
+1. Open `/login`, sign in, go to Dashboard.
+2. **Add server** with hostname/IP, SSH port (default 22), username, and password or PEM key.
+3. Open a server from the Dashboard for CPU, memory, network, and ports (auto-refresh ~10s).
+4. **Logout** clears the session.
 
-1. Open `/login`, enter the demo credentials, submit.
-2. You are redirected to the Dashboard (monitoring UI is behind login; metrics views stay read-only).
-3. Use **Logout** in the header to clear the session.
+SSH credentials are stored encrypted locally in SQLite and are never shown in the UI or committed to git.
+
+## Add server fields
+
+| Field | Notes |
+|-------|--------|
+| Display name | Friendly label |
+| Hostname / IP | Target Linux host |
+| SSH port | Default `22` |
+| SSH username | Remote user |
+| Auth | Password **or** private key (PEM) |
+
+On submit the app checks SSH reachability. Failure means unreachable / auth failed (no stack traces).
+
+## Dashboard
+
+Columns: name, host, port, status (`reachable` / `unreachable`), CPU %, memory %. Detail pages add network totals and listening ports. Secrets are never listed.
 
 ## Database
 
-SQLite file: `instance/monitoring.db` (or `DATABASE_PATH` if set). Local-only; gitignored via `*.db`. Password hashes only — never plain text.
+SQLite: `instance/monitoring.db` (or `DATABASE_PATH`). Local-only; gitignored. Admin password is hashed; SSH secrets are encrypted with a key derived from `SECRET_KEY`.
 
 ## Tests
 
 ```bash
-source venv/bin/activate
-pip install -r requirements-dev.txt
 pytest
 ```
 
-Tests use a temporary DB and dummy `SECRET_KEY` / demo password — not the real demo DB.
+Uses a temp DB, dummy secrets, and `SKIP_SSH` (fixture parsers — no live SSH in CI).
 
-## UI theme
+## CI
 
-Dark-ops layout (header + content shell). Monitoring views are intended to stay **read-only** (no remote shell or target config changes from the UI). Protected screens require sign-in.
+GitHub Actions runs install + `pytest` on push/PR. **No deploy** — run locally only. See [docs/ci.md](docs/ci.md).
+
+## Troubleshooting
+
+| Symptom | What to try |
+|---------|-------------|
+| Login fails | Use `admin` / `admin123`, or the `DEMO_PASSWORD` you set before first DB create |
+| SSH add fails | Host reachable? Port open? User/key/password correct? |
+| Blank metrics | Status `unreachable` — fix SSH; UI stays read-only |
 
 ## UI (MVP)
 
 1. **Login** — `/login`
-2. **Dashboard** — `/dashboard` (login required)
-3. **Server detail** — `/servers/<id>` (login required)
-4. **Add server** — `/servers/add` (login required)
-
-See [docs/requirements.md](docs/requirements.md) and [docs/TODO.md](docs/TODO.md).
+2. **Dashboard** — `/dashboard`
+3. **Server detail** — `/servers/<id>`
+4. **Add server** — `/servers/add`
